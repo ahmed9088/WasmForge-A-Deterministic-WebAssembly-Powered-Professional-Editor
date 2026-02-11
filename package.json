@@ -1,0 +1,14 @@
+{
+    "name": "kinetic-engine-monorepo",
+    "private": true,
+    "workspaces": [
+        "apps/*",
+        "engine"
+    ],
+    "scripts": {
+        "build:engine": "cd engine && wasm-pack build --target web --out-dir ../apps/frontend/src/wasm",
+        "dev:frontend": "npm run dev -w apps/frontend",
+        "dev:backend": "npm run dev -w apps/backend",
+        "test:engine": "cd engine && cargo test"
+    }
+}
