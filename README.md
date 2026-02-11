@@ -14,20 +14,20 @@
 
 ```mermaid
 graph TD
-    subgraph Frontend (React + Vite)
+    subgraph Frontend ["Frontend (React + Vite)"]
         UI[Cyber-Glass UI]
         Renderer[Canvas Renderer]
         Store[Action Store]
     end
 
-    subgraph Core (Rust + Wasm)
+    subgraph Core ["Core (Rust + Wasm)"]
         Engine[Kinetic Engine]
         Geometry[Fixed-Point Geometry]
         Physics[AABB Collision System]
         Anim[Time-Series Animation]
     end
 
-    subgraph Backend (Node.js + Hono)
+    subgraph Backend ["Backend (Node.js + Hono)"]
         API[Project API]
         WS[WebSocket Sync]
         DB[(Project Store)]
