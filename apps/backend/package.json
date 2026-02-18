@@ -25,7 +25,7 @@
     "ws": "^8.19.0"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
+    "@types/bcryptjs": "^3.0.0",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/ws": "^8.5.13",
     "tsx": "^4.21.0",
