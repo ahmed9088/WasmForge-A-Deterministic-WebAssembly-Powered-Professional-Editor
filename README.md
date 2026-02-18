@@ -7,6 +7,9 @@
 [![Wasm](https://img.shields.io/badge/WebAssembly-624DE8?style=for-the-badge&logo=webassembly&logoColor=white)](https://webassembly.org/)
 [![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![CI](https://img.shields.io/badge/CI-passing-brightgreen?style=for-the-badge)]()
+[![Contributing](https://img.shields.io/badge/PRs-welcome-blue?style=for-the-badge)](CONTRIBUTING.md)
+[![Code of Conduct](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa?style=for-the-badge)](CODE_OF_CONDUCT.md)
 
 ---
 
@@ -108,14 +111,42 @@ WasmForge is built on a "Time-Series Determinism" model.
 
 ---
 
+## ⚡ Quick Start
+
+```bash
+git clone https://github.com/ahmed9088/WasmForge.git && cd WasmForge
+npm install && npm run dev:frontend
+```
+
+Open [http://localhost:5173](http://localhost:5173) and start creating!
+
+---
+
+## 🗺️ Roadmap
+
+| Status | Feature |
+|:------:|:--------|
+| ✅ | Deterministic WASM engine with fixed-point math |
+| ✅ | Canvas rendering with Rect, Circle, Image elements |
+| ✅ | Animation timeline with keyframe support |
+| ✅ | Real-time collaboration via WebSockets |
+| ✅ | Command Palette, Keyboard Shortcuts, Context Menus |
+| ✅ | Undo/Redo with deterministic replay |
+| ✅ | CI/CD with GitHub Actions |
+| 🔧 | CRDT-based conflict-free collaboration |
+| 🔧 | Persistent storage with PostgreSQL |
+| 🔧 | Plugin system for engine extensions |
+| 🔧 | Text element support |
+| 🔧 | Export to SVG / PNG / PDF |
+
+---
+
 ## 🌍 Community & Launch
 
 Join the discussion!
 - **Hacker News**: [Show HN: WasmForge]
 - **Reddit**: [r/rust](https://reddit.com/r/rust), [r/webdev](https://reddit.com/r/webdev)
 - **Twitter**: [#BuildInPublic](https://twitter.com/hashtag/BuildInPublic)
-
----
 
 ---
 

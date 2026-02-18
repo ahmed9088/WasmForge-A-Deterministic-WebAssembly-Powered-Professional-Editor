@@ -32,10 +32,10 @@ impl Quadtree {
         let w = self.bounds.width / Scalar::from_num(2);
         let h = self.bounds.height / Scalar::from_num(2);
 
-        self.north_west = Some(Box::new(Quadtree::new(Rect::new_scalar(x, y, w, h), self.capacity)));
-        self.north_east = Some(Box::new(Quadtree::new(Rect::new_scalar(x + w, y, w, h), self.capacity)));
-        self.south_west = Some(Box::new(Quadtree::new(Rect::new_scalar(x, y + h, w, h), self.capacity)));
-        self.south_east = Some(Box::new(Quadtree::new(Rect::new_scalar(x + w, y + h, w, h), self.capacity)));
+        self.north_west = Some(Box::new(Quadtree::new(Rect { origin: Point { x, y }, width: w, height: h }, self.capacity)));
+        self.north_east = Some(Box::new(Quadtree::new(Rect { origin: Point { x: x + w, y }, width: w, height: h }, self.capacity)));
+        self.south_west = Some(Box::new(Quadtree::new(Rect { origin: Point { x, y: y + h }, width: w, height: h }, self.capacity)));
+        self.south_east = Some(Box::new(Quadtree::new(Rect { origin: Point { x: x + w, y: y + h }, width: w, height: h }, self.capacity)));
         
         self.divided = true;
     }
@@ -76,18 +76,13 @@ impl Quadtree {
             self.south_east.as_ref().unwrap().query(range, found);
         }
     }
-}
 
-// Helper addition to Rect needed
-impl Rect {
-    pub fn new_scalar(x: Scalar, y: Scalar, width: Scalar, height: Scalar) -> Self {
-        Self { origin: Point { x, y }, width, height }
-    }
-
-    pub fn intersects(&self, other: &Rect) -> bool {
-        !(other.origin.x > self.origin.x + self.width ||
-          other.origin.x + other.width < self.origin.x ||
-          other.origin.y > self.origin.y + self.height ||
-          other.origin.y + other.height < self.origin.y)
+    pub fn clear(&mut self) {
+        self.elements.clear();
+        self.divided = false;
+        self.north_west = None;
+        self.north_east = None;
+        self.south_west = None;
+        self.south_east = None;
     }
 }

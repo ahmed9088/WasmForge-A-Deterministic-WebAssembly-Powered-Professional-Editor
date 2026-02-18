@@ -1,15 +1,21 @@
 {
   "name": "backend",
-  "version": "1.0.0",
-  "description": "",
+  "version": "2.0.0",
+  "description": "WasmForge Backend — Project API & Real-time Collaboration",
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "wasmforge",
+    "api",
+    "collaboration"
+  ],
+  "author": "ahmed9088",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "@hono/node-server": "^1.19.9",
@@ -19,6 +25,10 @@
     "ws": "^8.19.0"
   },
   "devDependencies": {
-    "tsx": "^4.21.0"
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/ws": "^8.5.13",
+    "tsx": "^4.21.0",
+    "typescript": "^5.0.2"
   }
 }

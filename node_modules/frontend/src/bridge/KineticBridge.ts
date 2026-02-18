@@ -45,6 +45,17 @@ export class KineticBridge {
     }
 
     /**
+     * Resets the engine to its initial state.
+     * Used by the ActionStore for deterministic undo/redo replay.
+     */
+    public reset(): void {
+        if (this.engine) {
+            this.engine.reset();
+            console.log('[KineticBridge] Engine State Reset');
+        }
+    }
+
+    /**
      * Explicitly releases WASM memory.
      * Crucial for preventing leaks in long-lived SaaS sessions.
      */

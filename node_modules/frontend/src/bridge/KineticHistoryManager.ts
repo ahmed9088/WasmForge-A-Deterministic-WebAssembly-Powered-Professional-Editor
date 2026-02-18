@@ -67,7 +67,7 @@ export class KineticHistoryManager {
 
         // 3. Sequential dispatch to WASM
         // Note: In production, the WASM core should have a "batch_dispatch" to avoid JS-WASM context switching
-        let lastState: EngineState = { elements: {} };
+        let lastState: EngineState = this.bridge.getState();
         for (const action of actionsToReplay) {
             lastState = await this.bridge.dispatch(action);
         }

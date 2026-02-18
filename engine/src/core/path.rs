@@ -47,17 +47,54 @@ impl PathShape {
     }
 
     pub fn combine(&mut self, other: &PathShape, op: BooleanOp) {
-        // Simplified Boolean Logic: 
-        // For now, we contribute to the path commands.
-        // True Boolean operations (clipping) require complex algorithms like Weiler-Atherton.
-        // We will implement a command-based concatenation for 'Union' as a placeholder.
+        // Deterministic Boolean Path Operations
+        // Full implementation requires a library like 'clipper' or 'martinez'
+        // For now, we use deterministic command concatenation for Union
         match op {
             BooleanOp::Union => {
+                // If the paths overlap, we'd ideally remove inner edges.
+                // Deterministic fallback: simply append commands.
                 self.commands.extend(other.commands.clone());
             }
-            _ => {
-                // Placeholder for Subtract/Intersect
+            BooleanOp::Subtract => {
+                // To be implemented: requires calculating intersections.
             }
+            BooleanOp::Intersect => {
+                // To be implemented: requires calculating intersections.
+            }
+        }
+    }
+
+    pub fn get_bounds(&self) -> crate::core::geometry::Rect {
+        if self.commands.is_empty() {
+            return crate::core::geometry::Rect::new(0.0, 0.0, 0.0, 0.0);
+        }
+
+        let mut min_x = crate::core::geometry::Scalar::MAX;
+        let mut min_y = crate::core::geometry::Scalar::MAX;
+        let mut max_x = crate::core::geometry::Scalar::MIN;
+        let mut max_y = crate::core::geometry::Scalar::MIN;
+
+        for cmd in &self.commands {
+            let pts = match cmd {
+                PathCommand::MoveTo(p) => vec![p],
+                PathCommand::LineTo(p) => vec![p],
+                PathCommand::CurveTo(p1, p2, p3) => vec![p1, p2, p3],
+                PathCommand::Close => vec![],
+            };
+
+            for p in pts {
+                if p.x < min_x { min_x = p.x; }
+                if p.x > max_x { max_x = p.x; }
+                if p.y < min_y { min_y = p.y; }
+                if p.y > max_y { max_y = p.y; }
+            }
+        }
+
+        crate::core::geometry::Rect {
+            origin: crate::core::geometry::Point { x: min_x, y: min_y },
+            width: max_x - min_x,
+            height: max_y - min_y,
         }
     }
 }

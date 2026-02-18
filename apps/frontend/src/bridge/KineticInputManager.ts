@@ -1,4 +1,4 @@
-import { Action, Point } from './KineticTypes';
+import { Action, Point, EngineState, Element } from './KineticTypes';
 import { KineticBridge } from './KineticBridge';
 
 type InteractionMode = 'MOVE' | 'RESIZE' | 'NONE';
@@ -35,9 +35,10 @@ export class KineticInputManager {
      */
     private getNormalizedCoords(e: MouseEvent): Point {
         const rect = this.canvas.getBoundingClientRect();
+        const state = this.bridge.getState();
         return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
+            x: (e.clientX - rect.left - state.transform.x) / state.transform.scale,
+            y: (e.clientY - rect.top - state.transform.y) / state.transform.scale,
         };
     }
 
@@ -45,10 +46,11 @@ export class KineticInputManager {
         const coords = this.getNormalizedCoords(e);
         const state = this.bridge.getState();
 
-        // Hit Testing (Ideally delegated to WASM for large scenes)
         const hitId = this.performHitTest(coords, state);
 
         if (hitId) {
+            const el = state.elements[hitId];
+            if (el?.locked) return; // Can't interact with locked elements
             this.isDragging = true;
             this.selectedElementId = hitId;
             this.lastMousePos = coords;
@@ -71,12 +73,32 @@ export class KineticInputManager {
                 payload: { id: this.selectedElementId, dx, dy },
             });
         } else if (this.mode === 'RESIZE') {
-            // Simple scalar resizing logic for demonstration
-            const factor = 1 + (dx / 100);
-            this.bridge.dispatch({
-                type: 'RESIZE_ELEMENT',
-                payload: { id: this.selectedElementId, factor },
-            });
+            // Resize by updating element shape directly
+            const state = this.bridge.getState();
+            const el = state.elements[this.selectedElementId];
+            if (el && 'Rect' in el.shape) {
+                const rect = (el.shape as any).Rect;
+                this.bridge.dispatch({
+                    type: 'UPDATE_ELEMENT',
+                    payload: {
+                        id: this.selectedElementId,
+                        updates: {
+                            shape: { Rect: { ...rect, width: Math.max(10, rect.width + dx), height: Math.max(10, rect.height + dy) } }
+                        }
+                    },
+                });
+            } else if (el && 'Circle' in el.shape) {
+                const circle = (el.shape as any).Circle;
+                this.bridge.dispatch({
+                    type: 'UPDATE_ELEMENT',
+                    payload: {
+                        id: this.selectedElementId,
+                        updates: {
+                            shape: { Circle: { ...circle, radius: Math.max(5, circle.radius + dx) } }
+                        }
+                    },
+                });
+            }
         }
 
         this.lastMousePos = coords;
@@ -88,10 +110,12 @@ export class KineticInputManager {
     };
 
     private handleKeyDown = (e: KeyboardEvent) => {
-        // Example shortcut: Delete/Backspace
         if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedElementId) {
-            // Note: DELETE_ELEMENT would need implementation in WASM core
-            console.log(`Action: DELETE_ELEMENT(${this.selectedElementId})`);
+            this.bridge.dispatch({
+                type: 'REMOVE_ELEMENT',
+                payload: { id: this.selectedElementId },
+            });
+            this.selectedElementId = null;
         }
 
         // Custom shortcuts
@@ -99,15 +123,32 @@ export class KineticInputManager {
         this.shortcuts.get(combo)?.();
     };
 
-    private performHitTest(p: Point, state: any): string | null {
-        for (const [id, rect] of Object.entries(state.elements) as [string, any][]) {
-            if (
-                p.x >= rect.origin.x &&
-                p.x <= rect.origin.x + rect.width &&
-                p.y >= rect.origin.y &&
-                p.y <= rect.origin.y + rect.height
-            ) {
-                return id;
+    private performHitTest(p: Point, state: EngineState): string | null {
+        // Reverse iterate to hit top-most (highest zIndex) first
+        const sorted = Object.values(state.elements)
+            .filter(el => el.visible && !el.locked)
+            .sort((a, b) => (b.zIndex ?? 0) - (a.zIndex ?? 0));
+
+        for (const el of sorted) {
+            if ('Rect' in el.shape) {
+                const { origin, width, height } = (el.shape as any).Rect;
+                if (p.x >= origin.x && p.x <= origin.x + width &&
+                    p.y >= origin.y && p.y <= origin.y + height) {
+                    return el.id;
+                }
+            } else if ('Circle' in el.shape) {
+                const { center, radius } = (el.shape as any).Circle;
+                const dx = p.x - center.x;
+                const dy = p.y - center.y;
+                if (dx * dx + dy * dy <= radius * radius) {
+                    return el.id;
+                }
+            } else if ('Image' in el.shape) {
+                const { origin, width, height } = (el.shape as any).Image;
+                if (p.x >= origin.x && p.x <= origin.x + width &&
+                    p.y >= origin.y && p.y <= origin.y + height) {
+                    return el.id;
+                }
             }
         }
         return null;
